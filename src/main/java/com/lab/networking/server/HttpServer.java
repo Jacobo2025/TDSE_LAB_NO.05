@@ -63,6 +63,7 @@ public class HttpServer {
             String rawPath = parts[1];
             String path = rawPath;
             String queryString = "";
+
             int qIndex = rawPath.indexOf('?');
             if (qIndex != -1) {
                 path = rawPath.substring(0, qIndex);
@@ -92,6 +93,7 @@ public class HttpServer {
                 sendError(out, 400, "Bad Request");
                 return;
             }
+
             if (path.equals("/")) {
                 path = "/index.html";
             }
@@ -126,10 +128,12 @@ public class HttpServer {
     private static void handleGreeting(OutputStream out, String queryString) throws IOException {
         Map<String, String> params = parseQuery(queryString);
         String name = params.get("name");
+
         if (name == null || name.isBlank()) {
             sendError(out, 400, "Bad Request: missing 'name' parameter");
             return;
         }
+
         String json = "{\"greeting\":\"Hello, " + escapeJson(name) + "!\"}";
         sendJson(out, 200, "OK", json);
     }
@@ -138,12 +142,14 @@ public class HttpServer {
         Map<String, String> params = parseQuery(queryString);
         String valueStr = params.get("value");
         double value;
+
         try {
             value = Double.parseDouble(valueStr);
         } catch (Exception e) {
             sendError(out, 400, "Bad Request: invalid or missing 'value' parameter");
             return;
         }
+
         double square = value * value;
         String json = "{\"input\":" + value + ",\"square\":" + square + "}";
         sendJson(out, 200, "OK", json);
@@ -165,6 +171,7 @@ public class HttpServer {
         if (queryString == null || queryString.isBlank()) {
             return params;
         }
+
         for (String pair : queryString.split("&")) {
             String[] kv = pair.split("=", 2);
             String key = URLDecoder.decode(kv[0], StandardCharsets.UTF_8);
@@ -184,6 +191,7 @@ public class HttpServer {
             + "Content-Type: application/json\r\n"
             + "Content-Length: " + body.length + "\r\n"
             + "\r\n";
+
         out.write(headers.getBytes(StandardCharsets.UTF_8));
         out.write(body);
     }
@@ -194,6 +202,7 @@ public class HttpServer {
             + "Content-Type: text/plain\r\n"
             + "Content-Length: " + body.length + "\r\n"
             + "\r\n";
+
         out.write(response.getBytes(StandardCharsets.UTF_8));
         out.write(body);
     }
